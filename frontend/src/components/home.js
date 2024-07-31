@@ -1,9 +1,13 @@
 import React from 'react';
 import { Container, Row, Col, Button } from 'react-bootstrap';
-import logo from '../assets/Logo.jpeg'; 
+import logo from '../assets/Logo.jpeg';
+import Footer from './Footer'
+import Header from './Header'; 
 
-function HomePage() {
+function Home() {
   return (
+    <>
+     <Header />
     <Container fluid className="text-center mt-5">
       <Row>
         <Col>
@@ -15,7 +19,9 @@ function HomePage() {
         </Col>
       </Row>
     </Container>
+    <Footer />
+    </>
   );
 }
 
-export default HomePage;
+export default Home;

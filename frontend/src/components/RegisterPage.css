@@ -1,0 +1,36 @@
+.register-container {
+    background: linear-gradient(to right, #ffffff, #f8f9fa);
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .register-container .img-fluid {
+    max-width: 100%;
+    height: auto;
+  }
+  
+  .register-container .larger-logo {
+    width: 300px; /* Increase the width of the logo */
+  }
+  
+  .register-container .form-control {
+    border-radius: 0;
+    box-shadow: none;
+  }
+  
+  .register-container .btn-primary {
+    background: #007bff;
+    border: none;
+    border-radius: 0;
+  }
+  
+  .register-container .btn-primary:hover {
+    background: #0056b3;
+  }
+  
+  .register-container .text-center {
+    font-family: 'Arial', sans-serif;
+    color: #333;
+  }
+  
