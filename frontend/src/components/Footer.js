@@ -1,7 +1,7 @@
 import React from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import './Footer.css'; // Assuming you will add styles for the footer here
+import '../css/Footer.css'; // Assuming you will add styles for the footer here
 
 const Footer = () => {
   return (

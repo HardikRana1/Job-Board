@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
 import { Container, Row, Col, Form, Button, Alert } from 'react-bootstrap';
-import logo from '../assets/Registration.jpeg'; 
+import logo from '../assets/Logo.jpeg'; 
 import { useNavigate } from 'react-router-dom';
 import userApi from '../api/userAPi'; 
 import Header from './Header'; 
-import './RegisterPage.css';
+import '../css/RegisterPage.css';
 
 function RegisterPage() {
+  const [userType, setUserType] = useState('jobSeeker');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [companyName, setCompanyName] = useState('');
+  const [companyAddress, setCompanyAddress] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const navigate = useNavigate();
@@ -18,8 +21,15 @@ function RegisterPage() {
     e.preventDefault();
     setErrorMessage('');
     setSuccessMessage('');
+
+    // Basic validation
+    if (!name || !email || !password || (userType === 'employer' && (!companyName || !companyAddress))) {
+      setErrorMessage('Please fill in all required fields.');
+      return;
+    }
+
     try {
-      const userData = { name, email, password };
+      const userData = { userType, name, email, password, companyName, companyAddress };
       await userApi.register(userData);
       setSuccessMessage('Registration successful! Redirecting to login...');
       setTimeout(() => {
@@ -44,6 +54,17 @@ function RegisterPage() {
             {errorMessage && <Alert variant="danger">{errorMessage}</Alert>}
             {successMessage && <Alert variant="success">{successMessage}</Alert>}
             <Form onSubmit={handleSubmit}>
+              <Form.Group className="mb-3" controlId="formUserType">
+                <Form.Label>User Type</Form.Label>
+                <Form.Control 
+                  as="select" 
+                  value={userType} 
+                  onChange={(e) => setUserType(e.target.value)}
+                >
+                  <option value="jobSeeker">Job Seeker</option>
+                  <option value="employer">Employer</option>
+                </Form.Control>
+              </Form.Group>
               <Form.Group className="mb-3" controlId="formName">
                 <Form.Label>Name</Form.Label>
                 <Form.Control
@@ -51,7 +72,9 @@ function RegisterPage() {
                   placeholder="Enter your name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
+                  isInvalid={!name && errorMessage}
                 />
+                <Form.Control.Feedback type="invalid">Name is required.</Form.Control.Feedback>
               </Form.Group>
               <Form.Group className="mb-3" controlId="formEmail">
                 <Form.Label>Email address</Form.Label>
@@ -60,7 +83,9 @@ function RegisterPage() {
                   placeholder="Enter email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  isInvalid={!email && errorMessage}
                 />
+                <Form.Control.Feedback type="invalid">Email is required.</Form.Control.Feedback>
               </Form.Group>
               <Form.Group className="mb-3" controlId="formPassword">
                 <Form.Label>Password</Form.Label>
@@ -69,8 +94,36 @@ function RegisterPage() {
                   placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  isInvalid={!password && errorMessage}
                 />
+                <Form.Control.Feedback type="invalid">Password is required.</Form.Control.Feedback>
               </Form.Group>
+              {userType === 'employer' && (
+                <>
+                  <Form.Group className="mb-3" controlId="formCompanyName">
+                    <Form.Label>Company Name</Form.Label>
+                    <Form.Control
+                      type="text"
+                      placeholder="Enter company name"
+                      value={companyName}
+                      onChange={(e) => setCompanyName(e.target.value)}
+                      isInvalid={!companyName && errorMessage}
+                    />
+                    <Form.Control.Feedback type="invalid">Company Name is required.</Form.Control.Feedback>
+                  </Form.Group>
+                  <Form.Group className="mb-3" controlId="formCompanyAddress">
+                    <Form.Label>Company Address</Form.Label>
+                    <Form.Control
+                      type="text"
+                      placeholder="Enter company address"
+                      value={companyAddress}
+                      onChange={(e) => setCompanyAddress(e.target.value)}
+                      isInvalid={!companyAddress && errorMessage}
+                    />
+                    <Form.Control.Feedback type="invalid">Company Address is required.</Form.Control.Feedback>
+                  </Form.Group>
+                </>
+              )}
               <Button variant="primary" type="submit" className="w-100">Register</Button>
             </Form>
           </Col>

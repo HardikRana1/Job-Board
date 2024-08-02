@@ -4,26 +4,38 @@ import logo from '../assets/Login.jpeg';
 import { useNavigate } from 'react-router-dom';
 import userApi from '../api/userAPi';
 import Header from './Header'; 
-import './LoginPage.css';
+import '../css/LoginPage.css';
 
 function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [userType, setUserType] = useState('');
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage('');
     setSuccessMessage('');
+    // Basic validation
+    if (!email || !password ) {
+      setErrorMessage('Please fill in all required fields.');
+      return;
+    }
+
     try {
       const userData = { email, password };
-      await userApi.login(userData);
+      const response = await userApi.login(userData);
       setSuccessMessage('Login successful! Redirecting to home page...');
+      /*setUserType(response.data.userType);
       setTimeout(() => {
-        navigate('/');
-      }, 3000);
+        if (response.data.userType === 'employer') {
+          //navigate('/employer-dashboard');
+        } else {
+          //navigate('/job-seeker-dashboard');
+        }
+      }, 3000);*/
       console.log('Login successfully');
     } catch (error) {
       setErrorMessage('Login failed. Please check your email and password.');
@@ -51,7 +63,9 @@ function LoginPage() {
                   placeholder="Enter email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  isInvalid={!email && errorMessage}
                 />
+                <Form.Control.Feedback type="invalid">Email is required.</Form.Control.Feedback>
               </Form.Group>
               <Form.Group className="mb-3" controlId="formPassword">
                 <Form.Label>Password</Form.Label>
@@ -60,7 +74,9 @@ function LoginPage() {
                   placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  isInvalid={!password && errorMessage}
                 />
+                <Form.Control.Feedback type="invalid">Password is required.</Form.Control.Feedback>
               </Form.Group>
               <Button variant="primary" type="submit" className="w-100">Login</Button>
             </Form>
