@@ -28,14 +28,14 @@ function LoginPage() {
       const userData = { email, password };
       const response = await userApi.login(userData);
       setSuccessMessage('Login successful! Redirecting to home page...');
-      /*setUserType(response.data.userType);
+      localStorage.setItem('token', response.token); // Store the token
+      localStorage.setItem('userType', response.userType);
       setTimeout(() => {
-        if (response.data.userType === 'employer') {
-          //navigate('/employer-dashboard');
-        } else {
-          //navigate('/job-seeker-dashboard');
-        }
-      }, 3000);*/
+        if(response.userType == 'jobSeeker')
+          navigate('/navigation');
+        else
+        navigate('/profile');
+      }, 3000);
       console.log('Login successfully');
     } catch (error) {
       setErrorMessage('Login failed. Please check your email and password.');

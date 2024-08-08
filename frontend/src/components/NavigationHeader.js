@@ -1,10 +1,16 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { FaSearch } from 'react-icons/fa';
+import { Link, useNavigate } from 'react-router-dom';
 import logo from '../assets/Logo.jpeg'; // Ensure you have the logo image
-import '../css/Header.css'; // Import the CSS file
+import '../css/NavigationHeader.css'; // Import the CSS file
 
-const Header = () => {
+const NavigationHeader = () => {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem('token'); // Clear the token or authentication state
+    navigate('/login'); // Redirect to login page
+  };
+
   return (
     <header className="header">
       <div className="logo-container">
@@ -13,10 +19,8 @@ const Header = () => {
       </div>
       <nav>
         <ul className="nav-links">
-          
-          <li className="search-container">
-            <FaSearch className="search-icon" />
-            <input type="text" placeholder="Search jobs" className="search-input" />
+          <li>
+            <Link to="/navigation">Jobs</Link>
           </li>
           <li>
             <Link to="/applied-jobs">Applied Jobs</Link>
@@ -24,10 +28,13 @@ const Header = () => {
           <li>
             <Link to="/profile">Profile</Link>
           </li>
+          <li>
+            <button onClick={handleLogout} className="logout-button">Logout</button>
+          </li>
         </ul>
       </nav>
     </header>
   );
 };
 
-export default Header;
+export default NavigationHeader;

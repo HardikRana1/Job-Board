@@ -57,4 +57,12 @@
     border: none;
     border-radius: 5px;
   }
-  
+   
+.logout-button {
+  background: none;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+}

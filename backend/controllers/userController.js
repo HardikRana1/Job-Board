@@ -148,4 +148,34 @@ const generateToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' });
 };
 
-module.exports = { registerUser, authUser, updateUser, deleteUser };
+const getProfile = async (req, res) => {
+    try {
+      const user = await User.findById(req.user.id);
+      if (!user) return res.status(404).json({ message: 'User not found' });
+      res.status(200).json(user);
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to load user data' });
+    }
+  };
+  
+  const updateProfile = async (req, res) => {
+    try {
+      const { name, email, companyName, companyAddress } = req.body;
+      const user = await User.findById(req.user.id);
+      if (!user) return res.status(404).json({ message: 'User not found' });
+  
+      user.name = name || user.name;
+      user.email = email || user.email;
+      if (user.userType === 'employer') {
+        user.companyName = companyName || user.companyName;
+        user.companyAddress = companyAddress || user.companyAddress;
+      }
+  
+      await user.save();
+      res.status(200).json({ message: 'Profile updated successfully!' });
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to update profile' });
+    }
+  };
+ 
+module.exports = { registerUser, authUser, updateUser, deleteUser ,getProfile, updateProfile};

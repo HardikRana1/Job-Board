@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Container, Row, Col, Form, Button, Alert } from 'react-bootstrap';
-import logo from '../assets/Logo.jpeg'; 
+import logo from '../assets/Registration.jpeg'; 
 import { useNavigate } from 'react-router-dom';
 import userApi from '../api/userAPi'; 
 import Header from './Header'; 

@@ -1,0 +1,20 @@
+.profile-container {
+    margin-top: 50px;
+  }
+  
+  .profile-container h2 {
+    margin-bottom: 20px;
+  }
+  
+  .profile-container .form-label {
+    font-weight: bold;
+  }
+  
+  .profile-container .form-control {
+    margin-bottom: 15px;
+  }
+  
+  .profile-container .btn {
+    margin-top: 20px;
+  }
+  
