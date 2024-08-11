@@ -18,6 +18,8 @@ connectDB();
 const app = express();
 app.use(cors());
 app.use(express.json());
+// Serve static files from the React app
+app.use(express.static(path.join(__dirname, '../frontend/build')));
 
 app.use('/api/jobPosts', protect);
 app.use('/api/jobApplications', protect);
