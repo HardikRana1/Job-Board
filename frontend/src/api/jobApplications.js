@@ -1,5 +1,5 @@
 import axios from 'axios';
-const API_URL = 'http://localhost:5000/api/jobApplications/';
+const API_URL = '/api/jobApplications/';
 
 const genHeaders = (token) => {
     return {
