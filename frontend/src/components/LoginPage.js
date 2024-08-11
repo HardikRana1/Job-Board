@@ -34,7 +34,7 @@ function LoginPage() {
         if(response.userType == 'jobSeeker')
           navigate('/navigation');
         else
-        navigate('/profile');
+        navigate('/employer-dashboard');
       }, 3000);
       console.log('Login successfully');
     } catch (error) {

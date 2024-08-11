@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const applicationSchema = new mongoose.Schema({
   jobId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Job',
+    ref: 'Job-Post',  // Reference the correct model name
     required: true
   },
   userId: {
@@ -31,6 +31,11 @@ const applicationSchema = new mongoose.Schema({
   appliedDate: {
     type: Date,
     default: Date.now
+  },
+  status: {
+    type: String,
+    enum: ['Pending', 'Accepted', 'Rejected'],
+    default: 'Pending'
   }
 }, {
   timestamps: true

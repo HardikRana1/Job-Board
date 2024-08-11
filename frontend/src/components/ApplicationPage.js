@@ -37,7 +37,7 @@ function ApplicationPage() {
     setSuccessMessage('');
 
     if (!resume) {
-      setErrorMessage('Resume is required');
+      setErrorMessage('Resume and cover letter are required');
       return;
     }
 
@@ -66,12 +66,12 @@ function ApplicationPage() {
             {successMessage && <Alert variant="success">{successMessage}</Alert>}
             <h3>{job.title}</h3>
             <p>{job.description}</p>
-            <p><strong>Company:</strong> {job.company}</p>
+            <p><strong>Company:</strong> {job.companyName}</p>
             <p><strong>Location:</strong> {job.location}</p>
-            <p><strong>Requirements:</strong> {job.requirements}</p>
-            <p><strong>Salary:</strong> ${job.salary}</p>
-            <p><strong>Job Type:</strong> {job.jobType}</p>
-            <p><strong>Skills:</strong> {job.skills}</p>
+            <p><strong>Requirements:</strong> {job.description}</p>
+            <p><strong>Salary:</strong> ${job.salaryRange}</p>
+            <p><strong>Job Type:</strong> {job.type}</p>
+            <p><strong>Skills:</strong> {job.requiredSkills}</p>
             <Form onSubmit={handleSubmit}>
               <Form.Group className="mb-3" controlId="formCoverLetter">
                 <Form.Label>Cover Letter *</Form.Label>

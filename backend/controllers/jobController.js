@@ -1,4 +1,4 @@
-const Job = require('../models/Job');
+const Job = require('../models/jobModel');
 const Application = require('../models/application');
 const multer = require('multer');
 const { uploadFile } = require('../services/gridfsService');
@@ -8,12 +8,24 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage }).single('resume');
 
 const getJobs = async (req, res) => {
-  try {
+try {
+  console.log('get jobs:' + req.user);
+        const { userType } = req.user;
+
+        const jobs = userType === 'jobSeeker'
+            ? await Job.find({})
+            : await Job.find({ employer: req.user._id });
+
+        res.json(jobs);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+  /*try {
     const jobs = await Job.find();
     res.status(200).json(jobs);
   } catch (error) {
     res.status(500).json({ message: 'Failed to load jobs' });
-  }
+  }*/
 };
 
 const getJobDetails = async (req, res) => {
@@ -29,6 +41,7 @@ const getJobDetails = async (req, res) => {
 const appliedJobs = async (req, res) => {
   try {
     const applications = await Application.find({ userId: req.user.id });
+    console.log(applications);
     res.status(200).json(applications);
   } catch (error) {
     res.status(500).json({ message: 'Failed to load applied jobs' });
@@ -80,5 +93,78 @@ const submitApplication = async (req, res) => {
     }
   });
 };
+const createJob = async (req, res) => {
+    const { title, type, salaryRange, applicationDeadline, contactEmail, requiredSkills, companyName, description, location } = req.body;
+    
+    try {
+        const employer = req.user._id;
+        const job = await Job.create({ title, type, salaryRange, applicationDeadline, contactEmail, requiredSkills, companyName, description, location, employer: req.user._id });
+        res.status(201).json(job);
 
-module.exports = { getJobs, getJobDetails, submitApplication, appliedJobs };
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+const getJobById = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const job = await Job.findById(id);
+        res.json(job);
+    } catch (error) {
+        res.status(404).json({ message: error.message });
+    }
+};
+
+const updateJob = async (req, res) => {
+    const { id } = req.params;
+    const changes = req.body;
+
+    try {
+        const employer = req.user._id;
+        const job = await Job.findById(id);
+
+        if (job && job.employer.toString() === employer.toString()) {
+            
+            const keys = Object.keys(changes);
+
+            for (let i = 0; i < keys.length; i++) {
+                const field = keys[i];
+                job[field] = changes[field];
+            }
+
+            const updatedJob = await job.save();
+            res.json(updatedJob);
+        } else {
+            res.status(404).json({ message: 'Job is either not editable for you or it does not exist' });
+        }
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};
+
+const deleteJob = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const employer = req.user._id;
+        const job = await Job.findById(id);
+
+        if (job && job.employer.toString() === employer.toString()) {
+            await job.remove();
+            res.json({ message: 'Job removed' });
+        } else {
+            res.status(404).json({ message: 'Either Job cannot be deleted by you or it does not exist.' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+
+module.exports = { 
+ createJob,
+    getJobs,
+    getJobById,
+    updateJob,
+    deleteJob
+    , getJobDetails, submitApplication, appliedJobs };

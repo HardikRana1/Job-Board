@@ -46,9 +46,9 @@ function NavigationPage() {
 
   const filteredJobs = jobs.filter((job) => {
     const title = job.title ? job.title.toLowerCase() : '';
-    const company = job.company ? job.company.toLowerCase() : '';
+    const company = job.company ? job.companyName.toLowerCase() : '';
     const location = job.location ? job.location.toLowerCase() : '';
-    const skills = job.skills ? job.skills.toLowerCase() : '';
+    const skills = job.skills ? job.requiredSkills.toLowerCase() : '';
     const term = searchTerm.toLowerCase();
 
     return title.includes(term) || company.includes(term) || location.includes(term) || skills.includes(term);
@@ -83,12 +83,12 @@ function NavigationPage() {
                 <Card.Body>
                   <Card.Title>{job.title}</Card.Title>
                   <Card.Text>
-                    <strong>Company:</strong> {job.company}<br />
+                    <strong>Company:</strong> {job.companyName}<br />
                     <strong>Location:</strong> {job.location}<br />
-                    <strong>Requirements:</strong> {job.requirements}<br />
-                    <strong>Salary:</strong> ${job.salary}<br />
-                    <strong>Job Type:</strong> {job.jobType}<br />
-                    <strong>Skills:</strong> {job.skills}
+                    <strong>Requirements:</strong> {job.description}<br />
+                    <strong>Salary:</strong> ${job.salaryRange}<br />
+                    <strong>Job Type:</strong> {job.type}<br />
+                    <strong>Skills:</strong> {job.requiredSkills}
                   </Card.Text>
                   <Button
                     variant="primary"
