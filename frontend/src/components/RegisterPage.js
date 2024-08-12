@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Container, Row, Col, Form, Button, Alert } from 'react-bootstrap';
+import { Container, Row, Col, Form, Button, Alert, Spinner } from 'react-bootstrap';
 import logo from '../assets/Registration.jpeg'; 
 import { useNavigate } from 'react-router-dom';
 import userApi from '../api/userAPi'; 
@@ -15,16 +15,19 @@ function RegisterPage() {
   const [companyAddress, setCompanyAddress] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [loading, setLoading] = useState(false); // Add loading state
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage('');
     setSuccessMessage('');
+    setLoading(true); // Set loading to true when submission starts
 
     // Basic validation
     if (!name || !email || !password || (userType === 'employer' && (!companyName || !companyAddress))) {
       setErrorMessage('Please fill in all required fields.');
+      setLoading(false); // Reset loading if there's an error
       return;
     }
 
@@ -34,10 +37,12 @@ function RegisterPage() {
       setSuccessMessage('Registration successful! Redirecting to login...');
       setTimeout(() => {
         navigate('/login');
-      }, 3000);
+      }, 500);
     } catch (error) {
       setErrorMessage('Registration failed. Please try again.');
       console.error(error);
+    } finally {
+      setLoading(false); // Reset loading when submission is complete
     }
   };
 
@@ -124,10 +129,17 @@ function RegisterPage() {
                   </Form.Group>
                 </>
               )}
-              <Button variant="primary" type="submit" className="w-100">Register</Button>
+              <Button variant="primary" type="submit" className="w-100" disabled={loading}>
+                {loading ? <Spinner animation="border" size="sm" /> : 'Register'}
+              </Button>
             </Form>
           </Col>
         </Row>
+        {loading && (
+          <div className="loading-overlay">
+            <Spinner animation="border" variant="primary" />
+          </div>
+        )}
       </Container>
     </>
   );

@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Button, Form, InputGroup } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button, Form, InputGroup, Spinner } from 'react-bootstrap';
 import { FaSearch } from 'react-icons/fa'; // Import the search icon
 import jobApi from '../api/jobApi';
 import NavigationHeader from './NavigationHeader';
 import '../css/NavigationPage.css';
 import { Link } from 'react-router-dom';
+
 function NavigationPage() {
   const [jobs, setJobs] = useState([]);
   const [appliedJobs, setAppliedJobs] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(true); // Add loading state
   const jobsPerPage = 5;
 
   useEffect(() => {
@@ -31,8 +33,12 @@ function NavigationPage() {
       }
     };
 
-    fetchJobs();
-    fetchAppliedJobs();
+    const loadData = async () => {
+      await Promise.all([fetchJobs(), fetchAppliedJobs()]);
+      setLoading(false); // Set loading to false once data is loaded
+    };
+
+    loadData();
   }, []);
 
   const isJobApplied = (jobId) => {
@@ -76,50 +82,58 @@ function NavigationPage() {
             <FaSearch />
           </InputGroup.Text>
         </InputGroup>
-        <Row>
-          {currentJobs.map((job) => (
-            <Col key={job._id} md={12} className="mb-4">
-              <Card className="job-card">
-                <Card.Body>
-                  <Card.Title>{job.title}</Card.Title>
-                  <Card.Text>
-                    <strong>Company:</strong> {job.companyName}<br />
-                    <strong>Location:</strong> {job.location}<br />
-                    <strong>Requirements:</strong> {job.description}<br />
-                    <strong>Salary:</strong> ${job.salaryRange}<br />
-                    <strong>Job Type:</strong> {job.type}<br />
-                    <strong>Skills:</strong> {job.requiredSkills}
-                  </Card.Text>
-                  <Button
-                    variant="primary"
-                    as={Link}
-                    to={`/job/${job._id}`}
-                    disabled={isJobApplied(job._id)}
-                  >
-                    {isJobApplied(job._id) ? 'Already Applied' : 'View Details'}
-                  </Button>
-                </Card.Body>
-              </Card>
-            </Col>
-          ))}
-        </Row>
-        <div className="d-flex justify-content-center mt-4">
-          <Button
-            variant="secondary"
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-          >
-            Previous
-          </Button>
-          <span className="mx-3 align-self-center">{`Page ${currentPage} of ${totalPages}`}</span>
-          <Button
-            variant="secondary"
-            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-            disabled={currentPage === totalPages}
-          >
-            Next
-          </Button>
-        </div>
+        {loading ? (
+          <div className="d-flex justify-content-center mt-5">
+            <Spinner animation="border" variant="primary" />
+          </div>
+        ) : (
+          <>
+            <Row>
+              {currentJobs.map((job) => (
+                <Col key={job._id} md={12} className="mb-4">
+                  <Card className="job-card">
+                    <Card.Body>
+                      <Card.Title>{job.title}</Card.Title>
+                      <Card.Text>
+                        <strong>Company:</strong> {job.companyName}<br />
+                        <strong>Location:</strong> {job.location}<br />
+                        <strong>Requirements:</strong> {job.description}<br />
+                        <strong>Salary:</strong> ${job.salaryRange}<br />
+                        <strong>Job Type:</strong> {job.type}<br />
+                        <strong>Skills:</strong> {job.requiredSkills}
+                      </Card.Text>
+                      <Button
+                        variant="primary"
+                        as={Link}
+                        to={`/job/${job._id}`}
+                        disabled={isJobApplied(job._id)}
+                      >
+                        {isJobApplied(job._id) ? 'Already Applied' : 'View Details'}
+                      </Button>
+                    </Card.Body>
+                  </Card>
+                </Col>
+              ))}
+            </Row>
+            <div className="d-flex justify-content-center mt-4">
+              <Button
+                variant="secondary"
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+              >
+                Previous
+              </Button>
+              <span className="mx-3 align-self-center">{`Page ${currentPage} of ${totalPages}`}</span>
+              <Button
+                variant="secondary"
+                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+              >
+                Next
+              </Button>
+            </div>
+          </>
+        )}
       </Container>
     </>
   );

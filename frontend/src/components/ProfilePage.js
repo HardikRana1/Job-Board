@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Form, Button, Alert } from 'react-bootstrap';
-import userApi from '../api/userAPi';
+import { Container, Row, Col, Form, Button, Alert, Spinner } from 'react-bootstrap';
+import userApi from '../api/userAPi'; // Ensure the import path is correct
 import NavigationHeader from './NavigationHeader';
 import '../css/ProfilePage.css';
 
@@ -12,6 +12,7 @@ function ProfilePage() {
   const [companyAddress, setCompanyAddress] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [loading, setLoading] = useState(true); // Add loading state
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -22,8 +23,10 @@ function ProfilePage() {
         setEmail(response.data.email);
         setCompanyName(response.data.companyName);
         setCompanyAddress(response.data.companyAddress);
+        setLoading(false); // Set loading to false once data is loaded
       } catch (error) {
         setErrorMessage('Failed to load user data');
+        setLoading(false); // Set loading to false if there's an error
       }
     };
 
@@ -43,6 +46,14 @@ function ProfilePage() {
       setErrorMessage('Failed to update profile');
     }
   };
+
+  if (loading) {
+    return (
+      <Container className="d-flex justify-content-center align-items-center mt-5" style={{ height: '100vh' }}>
+        <Spinner animation="border" variant="primary" />
+      </Container>
+    );
+  }
 
   return (
     <>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Container, Row, Col, Form, Button, Alert } from 'react-bootstrap';
+import { Container, Row, Col, Form, Button, Alert, Spinner } from 'react-bootstrap';
 import logo from '../assets/Login.jpeg'; 
 import { useNavigate } from 'react-router-dom';
 import userApi from '../api/userAPi';
@@ -11,16 +11,19 @@ function LoginPage() {
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
-  const [userType, setUserType] = useState('');
+  const [loading, setLoading] = useState(false); // Add loading state
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage('');
     setSuccessMessage('');
+    setLoading(true); // Set loading to true when submission starts
+
     // Basic validation
-    if (!email || !password ) {
+    if (!email || !password) {
       setErrorMessage('Please fill in all required fields.');
+      setLoading(false); // Reset loading if there's an error
       return;
     }
 
@@ -31,15 +34,17 @@ function LoginPage() {
       localStorage.setItem('token', response.token); // Store the token
       localStorage.setItem('userType', response.userType);
       setTimeout(() => {
-        if(response.userType == 'jobSeeker')
+        if (response.userType === 'jobSeeker')
           navigate('/navigation');
         else
-        navigate('/employer-dashboard');
-      }, 3000);
+          navigate('/employer-dashboard');
+      }, 500);
       console.log('Login successfully');
     } catch (error) {
       setErrorMessage('Login failed. Please check your email and password.');
       console.error(error);
+    } finally {
+      setLoading(false); // Reset loading when submission is complete
     }
   };
 
@@ -78,10 +83,17 @@ function LoginPage() {
                 />
                 <Form.Control.Feedback type="invalid">Password is required.</Form.Control.Feedback>
               </Form.Group>
-              <Button variant="primary" type="submit" className="w-100">Login</Button>
+              <Button variant="primary" type="submit" className="w-100" disabled={loading}>
+                {loading ? <Spinner animation="border" size="sm" /> : 'Login'}
+              </Button>
             </Form>
           </Col>
         </Row>
+        {loading && (
+          <div className="loading-overlay">
+            <Spinner animation="border" variant="primary" />
+          </div>
+        )}
       </Container>
     </>
   );

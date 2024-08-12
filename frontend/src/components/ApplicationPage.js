@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Form, Button, Alert } from 'react-bootstrap';
+import { Container, Row, Col, Form, Button, Alert, Spinner } from 'react-bootstrap';
 import { useParams, useNavigate } from 'react-router-dom';
 import jobApi from '../api/jobApi';
 import NavigationHeader from './NavigationHeader';
@@ -13,14 +13,19 @@ function ApplicationPage() {
   const [resume, setResume] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false); // Add loading state
+  const [isJobLoading, setIsJobLoading] = useState(true); // Add loading state for job data
 
   useEffect(() => {
     const fetchJobDetails = async () => {
+      setIsJobLoading(true); // Set job loading to true when fetching starts
       try {
         const response = await jobApi.getJobDetails(jobId);
         setJob(response.data);
       } catch (error) {
         setErrorMessage('Failed to load job details');
+      } finally {
+        setIsJobLoading(false); // Set job loading to false when fetching is complete
       }
     };
 
@@ -39,9 +44,11 @@ function ApplicationPage() {
     e.preventDefault();
     setErrorMessage('');
     setSuccessMessage('');
+    setIsLoading(true); // Set loading to true when submission starts
 
     if (!resume) {
       setErrorMessage('Resume is required');
+      setIsLoading(false); // Reset loading if there's an error
       return;
     }
 
@@ -56,11 +63,21 @@ function ApplicationPage() {
     try {
       await jobApi.submitApplication(formData);
       setSuccessMessage('Application submitted successfully!');
-      setTimeout(() => navigate('/navigation'), 2000); // Redirect after 2 seconds
+      setTimeout(() => navigate('/navigation'), 500); // Redirect after 0.5 seconds
     } catch (error) {
       setErrorMessage(error.response?.data?.message || 'Failed to submit application');
+    } finally {
+      setIsLoading(false); // Reset loading when submission is complete
     }
   };
+
+  if (isJobLoading) {
+    return (
+      <Container className="d-flex justify-content-center align-items-center mt-5" style={{ height: '100vh' }}>
+        <Spinner animation="border" variant="primary" />
+      </Container>
+    );
+  }
 
   return (
     <>
@@ -96,7 +113,9 @@ function ApplicationPage() {
                   onChange={handleCoverLetterChange}
                 />
               </Form.Group>
-              <Button variant="primary" type="submit" className="w-100">Submit Application</Button>
+              <Button variant="primary" type="submit" className="w-100" disabled={isLoading}>
+                {isLoading ? <Spinner animation="border" size="sm" /> : 'Submit Application'}
+              </Button>
             </Form>
           </Col>
         </Row>
