@@ -29,7 +29,7 @@ const AppliedJobPage = () => {
             <Paper elevation={3} sx={{ p: 3 }}>
               <Typography variant="h6">{application.jobId.title}</Typography>
               <Typography>Status: {application.status}</Typography>
-              <Typography>Date Applied: {application.dateApplied}</Typography>
+              <Typography>Date Applied: {application.appliedDate}</Typography>
               <Typography>Company: {application.jobId.companyName}</Typography>
               <Typography>Location: {application.jobId.location}</Typography>
               <Typography>Description: {application.jobId.description}</Typography>

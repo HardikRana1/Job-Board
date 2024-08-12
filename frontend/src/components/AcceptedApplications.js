@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Box, Typography, Paper, Button, Link, Container, Grid } from '@mui/material';
 import jobApplicationsAPI from '../api/jobApplications';
 import Header from './Header';
+import axios from 'axios';
 
 const AcceptedApplicationPage = () => {
   const [acceptedApplications, setAcceptedApplications] = useState([]);
@@ -10,7 +11,9 @@ const AcceptedApplicationPage = () => {
     const token = localStorage.getItem('token');
 
     jobApplicationsAPI.getAllJobApplications(token).then((applications) => {
-      setAcceptedApplications(applications.filter(app => app.status !== 'rejected'));
+      console.log('application');
+      console.log(applications);
+      setAcceptedApplications(applications.filter(app => app.status !== '"Rejected"'));
     });
   }, []);
 
@@ -40,7 +43,31 @@ const AcceptedApplicationPage = () => {
       return current.filter(app => app._id !== application._id);
     });
   };
+  const handleDownload = async (fileId, fileName) => {
+    const token = localStorage.getItem('token');
+    console.log(fileId);
+    try {
+      const response = await axios.get(`https://job-board-backend-59cu.onrender.com/api/jobApplications/files/${fileId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        responseType: 'blob', // Important for handling binary data
+      });
 
+      // Create a URL for the blob and trigger the download
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', fileName); // or extract from response.headers['content-disposition']
+      document.body.appendChild(link);
+      link.click();
+
+      // Clean up and remove the link
+      link.parentNode.removeChild(link);
+    } catch (error) {
+      console.error('Failed to download file:', error);
+    }
+  };
   return (
     <>
       <Header />
@@ -59,11 +86,11 @@ const AcceptedApplicationPage = () => {
                 <Typography>Status: {application.status}</Typography>
                 <Typography>Email: {application.applicantEmail}</Typography>
                 <Typography>
-                  Resume: <Link href={`/api/jobApplications/files/${application.resumeId}`} target="_blank">View</Link>
+                  Resume: <Link component="button" onClick={() => handleDownload(application.resumeId, application.applicantName+'.pdf')}>Download</Link>
                 </Typography>
                 {application.coverLetter && (
                   <Typography>
-                    Cover Letter: <Link href={`/api/jobApplications/files/${application.coverLetter}`} target="_blank">View</Link>
+                    Cover Letter: <Link component="button" onClick={() => handleDownload(application.coverLetter, 'coverLetter.pdf')}>Download</Link>
                   </Typography>
                 )}
                 <Box sx={{ mt: 2 }}>

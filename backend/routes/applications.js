@@ -5,31 +5,39 @@ const { applyForJob, getApplications, getApplicationById, updateApplication, del
 
 const router = Router();
 
+const { GridFSBucket } = require('mongodb');
+
+let gfsBucket;
 // Initialize GridFS
 const conn = mongoose.connection;
-let gfs;
 
 conn.once('open', () => {
-    gfs = Grid(conn.db, mongoose.mongo);
-    gfs.collection('uploads'); // The name of the collection where files are stored
+    gfsBucket = new GridFSBucket(conn.db, {
+        bucketName: 'uploads',
+    });
 });
 // Route to get and download a file (resume or cover letter)
 router.get('/files/:id', async (req, res) => {
     try {
-        const file = await gfs.files.findOne({ _id: mongoose.Types.ObjectId(req.params.id) });
-        
-        if (!file || file.length === 0) {
+        const _id = new mongoose.Types.ObjectId(req.params.id);
+
+        const files = await conn.db.collection('uploads.files').findOne({ _id });
+
+        if (!files || files.length === 0) {
             return res.status(404).json({ err: 'No file exists' });
         }
 
-        // Set response headers and pipe the file stream to the response
-        const readstream = gfs.createReadStream(file.filename);
-        res.set('Content-Type', file.contentType);
-        readstream.pipe(res);
+        const downloadStream = gfsBucket.openDownloadStream(_id);
+
+        res.set('Content-Type', files.contentType);
+        downloadStream.pipe(res);
     } catch (err) {
-        res.status(500).json({ err: 'Error retrieving file' });
+        console.error('Error retrieving file:', err.message);
+        res.status(500).json({ err: 'Error retrieving file', details: err.message });
     }
 });
+
+
 // Application routes
 router.get('/', getApplications);
 router.get('/:id', getApplicationById);

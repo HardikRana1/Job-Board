@@ -11,9 +11,13 @@ const applicationSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
-  coverLetter: {
+  /*coverLetter: {
     type: String,
-    required: true
+    required: false
+  },*/
+  coverLetter: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'uploads.files'
   },
   resumeId: {
     type: mongoose.Schema.Types.ObjectId,

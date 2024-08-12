@@ -4,7 +4,7 @@ import { FaSearch } from 'react-icons/fa'; // Import the search icon
 import jobApi from '../api/jobApi';
 import NavigationHeader from './NavigationHeader';
 import '../css/NavigationPage.css';
-
+import { Link } from 'react-router-dom';
 function NavigationPage() {
   const [jobs, setJobs] = useState([]);
   const [appliedJobs, setAppliedJobs] = useState([]);
@@ -92,7 +92,8 @@ function NavigationPage() {
                   </Card.Text>
                   <Button
                     variant="primary"
-                    href={`/job/${job._id}`}
+                    as={Link}
+                    to={`/job/${job._id}`}
                     disabled={isJobApplied(job._id)}
                   >
                     {isJobApplied(job._id) ? 'Already Applied' : 'View Details'}

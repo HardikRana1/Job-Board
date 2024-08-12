@@ -9,7 +9,7 @@ function ApplicationPage() {
   const { jobId } = useParams();
   const navigate = useNavigate();
   const [job, setJob] = useState({});
-  const [coverLetter, setCoverLetter] = useState('');
+  const [coverLetter, setCoverLetter] = useState(null);
   const [resume, setResume] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
@@ -31,20 +31,27 @@ function ApplicationPage() {
     setResume(e.target.files[0]);
   };
 
+  const handleCoverLetterChange = (e) => {
+    setCoverLetter(e.target.files[0]);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage('');
     setSuccessMessage('');
 
     if (!resume) {
-      setErrorMessage('Resume and cover letter are required');
+      setErrorMessage('Resume is required');
       return;
     }
 
     const formData = new FormData();
     formData.append('jobId', jobId);
-    formData.append('coverLetter', coverLetter);
     formData.append('resume', resume);
+
+    if (coverLetter) {
+      formData.append('coverLetter', coverLetter);
+    }
 
     try {
       await jobApi.submitApplication(formData);
@@ -73,22 +80,20 @@ function ApplicationPage() {
             <p><strong>Job Type:</strong> {job.type}</p>
             <p><strong>Skills:</strong> {job.requiredSkills}</p>
             <Form onSubmit={handleSubmit}>
-              <Form.Group className="mb-3" controlId="formCoverLetter">
-                <Form.Label>Cover Letter *</Form.Label>
-                <Form.Control
-                  as="textarea"
-                  rows={3}
-                  placeholder="Write your cover letter"
-                  value={coverLetter}
-                  onChange={(e) => setCoverLetter(e.target.value)}
-                />
-              </Form.Group>
               <Form.Group className="mb-3" controlId="formResume">
                 <Form.Label>Resume *</Form.Label>
                 <Form.Control
                   type="file"
                   accept=".doc,.docx,.pdf"
                   onChange={handleResumeChange}
+                />
+              </Form.Group>
+              <Form.Group className="mb-3" controlId="formCoverLetter">
+                <Form.Label>Cover Letter (Optional)</Form.Label>
+                <Form.Control
+                  type="file"
+                  accept=".doc,.docx,.pdf"
+                  onChange={handleCoverLetterChange}
                 />
               </Form.Group>
               <Button variant="primary" type="submit" className="w-100">Submit Application</Button>

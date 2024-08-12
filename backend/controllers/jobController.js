@@ -5,8 +5,11 @@ const { uploadFile } = require('../services/gridfsService');
 
 // Setup multer for file uploads
 const storage = multer.memoryStorage();
-const upload = multer({ storage }).single('resume');
-
+//const upload = multer({ storage }).single('resume');
+const upload = multer({ storage }).fields([
+  { name: 'resume', maxCount: 1 },
+  { name: 'coverLetter', maxCount: 1 }
+]);
 const getJobs = async (req, res) => {
 try {
   console.log('get jobs:' + req.user);
@@ -47,7 +50,7 @@ const appliedJobs = async (req, res) => {
     res.status(500).json({ message: 'Failed to load applied jobs' });
   }
 };
-
+/*
 const submitApplication = async (req, res) => {
   upload(req, res, async (err) => {
     if (err) {
@@ -92,7 +95,67 @@ const submitApplication = async (req, res) => {
       res.status(500).json({ message: 'Failed to submit application' });
     }
   });
+};*/
+const submitApplication = async (req, res) => {
+  upload(req, res, async (err) => {
+    if (err) {
+      return res.status(500).json({ message: 'Failed to upload files' });
+    }
+  
+    // Check if the resume file is present
+    if (!req.files || !req.files.resume || req.files.resume.length === 0) {
+      return res.status(400).json({ message: 'Resume is required' });
+    }
+  
+    try {
+      const { jobId } = req.body;
+      let coverLetterFile = null;
+  
+      // Check if the user has already applied for the job
+      const existingApplication = await Application.findOne({ jobId, userId: req.user.id });
+      if (existingApplication) {
+        return res.status(400).json({ message: 'You have already applied for this job' });
+      }
+  
+      // Upload resume file
+      console.log('Resume file:', req.files.resume[0]);
+      const resumeFile = await uploadFile(req.files.resume[0]);
+      if (!resumeFile || !resumeFile._id) {
+        throw new Error('Failed to upload resume file');
+      }
+  
+      console.log('Resume file ID:', resumeFile._id);
+      console.log('user ID:', req.user.id);
+  
+      // If a cover letter is provided, upload it
+      if (req.files.coverLetter && req.files.coverLetter.length > 0) {
+        console.log('Cover letter file:', req.files.coverLetter[0]);
+        coverLetterFile = await uploadFile(req.files.coverLetter[0]);
+        if (!coverLetterFile || !coverLetterFile._id) {
+          throw new Error('Failed to upload cover letter file');
+        }
+        console.log('Cover letter file ID:', coverLetterFile._id);
+      }
+  
+      // Create and save the application
+      const application = new Application({
+        jobId,
+        userId: req.user.id,
+        coverLetter: coverLetterFile ? coverLetterFile._id : null,
+        resumeId: resumeFile._id,
+        applicantName: req.user.name,
+        applicantEmail: req.user.email
+      });
+  
+      await application.save();
+      res.status(201).json({ message: 'Application submitted successfully!' });
+    } catch (error) {
+      console.error('Error during application submission:', error);
+      res.status(500).json({ message: 'Failed to submit application' });
+    }
+  });
 };
+
 const createJob = async (req, res) => {
     const { title, type, salaryRange, applicationDeadline, contactEmail, requiredSkills, companyName, description, location } = req.body;
     
