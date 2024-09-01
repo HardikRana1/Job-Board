@@ -18,7 +18,7 @@ app.use(cors());
 app.use(express.json());
 
 // Serve static files from the React app
-app.use(express.static(path.join(__dirname, '../frontend/build')));
+app.use(express.static(path.join(__dirname, '../frontend')));
 
 app.use('/api/jobPosts', protect);
 app.use('/api/jobApplications', protect);
@@ -29,7 +29,7 @@ app.use('/api/jobApplications', applicationRoutes);
 
 // All other requests are sent to the React app
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
+    res.sendFile(path.join(__dirname, '../frontend', 'index.html'));
 });
 
 const PORT = process.env.PORT || 5000;
