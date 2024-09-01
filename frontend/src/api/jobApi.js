@@ -1,8 +1,8 @@
 import axios from 'axios';
 import CreateJobPage from '../components/CreateJobPage';
 
-const API_URL = 'https://job-board-backend-59cu.onrender.com/api/jobPosts';
-//const API_URL = 'http://localhost:5000/api/jobPosts';
+//const API_URL = 'https://job-board-backend-59cu.onrender.com/api/jobPosts';
+const API_URL = '/api/jobPosts';
 
 const genHeaders = (token) => {
     return {

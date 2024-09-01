@@ -55,7 +55,7 @@ const AcceptedApplicationPage = () => {
     const token = localStorage.getItem('token');
     console.log(fileId);
     try {
-      const response = await axios.get(`https://job-board-backend-59cu.onrender.com/api/jobApplications/files/${fileId}`, {
+      const response = await axios.get(`/api/jobApplications/files/${fileId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
